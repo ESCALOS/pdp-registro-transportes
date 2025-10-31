@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('company_documents', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->constrained()->onDelete('restrict');
+            $table->string('type');
+            $table->string('path');
+            $table->string('status')->default('pending');
+            $table->text('rejection_reason')->nullable();
+            $table->date('submitted_date')->nullable();
+            $table->foreignId('validated_by')->nullable()->constrained('users')->onDelete('restrict');
+            $table->date('validated_date')->nullable();
             $table->timestamps();
         });
     }
