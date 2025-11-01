@@ -6,7 +6,7 @@ use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 
-enum CompanyStatusEnum: int implements HasColor, HasIcon, HasLabel
+enum CompanyDocumentStatusEnum: int implements HasColor, HasIcon, HasLabel
 {
     case PENDING = 1;
     case APPROVED = 2;

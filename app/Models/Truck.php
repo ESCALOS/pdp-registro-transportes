@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Truck extends Model
+{
+    /** @use HasFactory<\Database\Factories\TruckFactory> */
+    use HasFactory, SoftDeletes;
+
+    protected $fillable = [
+        'company_id',
+        'license_plate',
+        'status',
+    ];
+
+    protected $casts = [
+        'status' => \App\Enums\TruckStatusEnum::class,
+    ];
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+}

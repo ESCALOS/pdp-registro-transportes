@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('companies', function (Blueprint $table) {
+        Schema::create('trucks', function (Blueprint $table) {
             $table->id();
-            $table->integer('type')->default(1)->comment('1: Natural, 2: Jurídica');
-            $table->string('ruc', 11)->unique();
-            $table->string('business_name');
-            $table->integer('status')->default(1)->comment('1: Pendiente, 2: Aprobado, 3: Rechazado');
-            $table->string('name');
+            $table->foreignId('company_id')->constrained()->onDelete('restrict');
+            $table->string('license_plate', 10)->unique();
+            $table->integer('status')->default(1)->comment('1: Inactivo, 2: Activo, 3: Necesita Actualización');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->unique(['company_id', 'license_plate']);
         });
     }
 
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('companies');
+        Schema::dropIfExists('trucks');
     }
 };
