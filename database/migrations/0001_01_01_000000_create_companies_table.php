@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('ruc', 11)->unique();
             $table->string('business_name');
             $table->integer('status')->default(1)->comment('1: Pendiente, 2: Aprobado, 3: Rechazado');
-            $table->string('name');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();
         });

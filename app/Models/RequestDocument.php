@@ -75,6 +75,6 @@ class RequestDocument extends Model
 
     public function getDaysUntilExpiration(): int
     {
-        return now()->diffInDays($this->expiration_date, false);
+        return (int) now()->diffInDays($this->expiration_date, false);
     }
 }

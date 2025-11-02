@@ -10,7 +10,7 @@ enum CompanyDocumentTypeEnum: int implements HasColor, HasIcon, HasLabel
 {
     case RUC_RECORD = 1;
     case REPRESENTATIVE_DNI = 2;
-    case SUNARP = 3;
+    case FICHA_SUNARP = 3;
     case POWER_OF_ATTORNEY_VALIDITY = 4;
 
     public function getLabel(): string
@@ -18,7 +18,7 @@ enum CompanyDocumentTypeEnum: int implements HasColor, HasIcon, HasLabel
         return match ($this) {
             self::RUC_RECORD => 'Ficha RUC',
             self::REPRESENTATIVE_DNI => 'DNI Representante',
-            self::SUNARP => 'SUNARP',
+            self::FICHA_SUNARP => 'Ficha SUNARP',
             self::POWER_OF_ATTORNEY_VALIDITY => 'Vigencia de Poder',
         };
     }
@@ -28,7 +28,7 @@ enum CompanyDocumentTypeEnum: int implements HasColor, HasIcon, HasLabel
         return match ($this) {
             self::RUC_RECORD => 'primary',
             self::REPRESENTATIVE_DNI => 'secondary',
-            self::SUNARP => 'tertiary',
+            self::FICHA_SUNARP => 'tertiary',
             self::POWER_OF_ATTORNEY_VALIDITY => 'info',
         };
     }
@@ -38,7 +38,7 @@ enum CompanyDocumentTypeEnum: int implements HasColor, HasIcon, HasLabel
         return match ($this) {
             self::RUC_RECORD => 'heroicon-o-document-text',
             self::REPRESENTATIVE_DNI => 'heroicon-o-identification',
-            self::SUNARP => 'heroicon-o-building-library',
+            self::FICHA_SUNARP => 'heroicon-o-building-library',
             self::POWER_OF_ATTORNEY_VALIDITY => 'heroicon-o-briefcase',
         };
     }

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('company_documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained()->onDelete('restrict');
-            $table->string('type')->comment('1: Ficha RUC, 2: DNI Representante, 3: SUNARP, 4: Vigencia de Poder');
+            $table->string('type')->comment('1: Ficha RUC, 2: DNI Representante, 3: Ficha SUNARP, 4: Vigencia de Poder');
             $table->string('path');
             $table->integer('status')->default(1)->comment('1: Pendiente, 2: Aprobado, 3: Rechazado');
             $table->text('rejection_reason')->nullable();

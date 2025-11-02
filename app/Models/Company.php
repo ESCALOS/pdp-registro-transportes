@@ -16,7 +16,6 @@ class Company extends Model
         'ruc',
         'business_name',
         'status',
-        'name',
     ];
 
     protected $casts = [

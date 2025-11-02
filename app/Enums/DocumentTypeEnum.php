@@ -6,7 +6,7 @@ use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 
-enum DocumentTypeEnum: string implements HasLabel, HasColor, HasIcon
+enum DocumentTypeEnum: string implements HasColor, HasIcon, HasLabel
 {
     // DRIVER DOCS
     case DNI = 'dni';
@@ -66,9 +66,8 @@ enum DocumentTypeEnum: string implements HasLabel, HasColor, HasIcon
         return 'primary';
     }
 
-    public function getIcon(): ?string
+    public function getIcon(): string
     {
         return 'heroicon-o-document-text';
     }
-
 }
