@@ -30,4 +30,9 @@ class Truck extends Model
     {
         return $this->morphMany(Document::class, 'documentable');
     }
+
+    public function requestItems()
+    {
+        return $this->morphMany(RequestItem::class, 'itemable');
+    }
 }
