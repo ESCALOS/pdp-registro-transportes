@@ -9,8 +9,10 @@ Route::get('/', function () {
 });
 
 // Rutas para registro de empresa
-Route::get('/registro-empresa', [CompanyController::class, 'showRegistrationForm'])->name('company.register');
-Route::post('/registro-empresa', [CompanyController::class, 'store'])->name('company.store');
+Route::middleware('guest')->group(function () {
+    Volt::route('registrar-empresa', 'company.register')
+        ->name('company.register');
+});
 
 Route::middleware('auth')->group(function () {
     Volt::route('dashboard', 'dashboard')

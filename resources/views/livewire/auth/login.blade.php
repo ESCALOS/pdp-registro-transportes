@@ -151,7 +151,8 @@ class extends Component {
             <!-- Register Company Link -->
             <div class="border-t pt-6 mt-6">
                 <a
-                    href="#"
+                    href="{{ route('company.register') }}"
+                    wire:navigate
                     class="w-full block text-center py-3 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition duration-200 font-medium"
                 >
                     Registrar Empresa
