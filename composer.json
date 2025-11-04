@@ -22,6 +22,7 @@
         "livewire/volt": "^1.8",
         "swisnl/filament-backgrounds": "^2.0",
         "unknow-sk/filament-logger": "^1.0",
+        "wireui/heroicons": "^2.9",
         "wireui/wireui": "^2.4"
     },
     "require-dev": {
