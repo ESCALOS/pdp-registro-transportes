@@ -23,10 +23,13 @@ class User extends Authenticatable implements FilamentUser
     use Notifiable;
 
     protected $fillable = [
+        'dni',
         'name',
+        'last_name',
         'email',
         'password',
         'company_id',
+        'is_company_representative',
         'is_active',
     ];
 

@@ -10,7 +10,7 @@
         <img src="{{ asset('images/logo-pdp.webp') }}" alt="{{ config('app.name') }} Logo" class="h-12" />
     </div>
 </header>
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     {{ $slot }}
 </div>
 </body>

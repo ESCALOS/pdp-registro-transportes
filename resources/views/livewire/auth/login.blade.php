@@ -33,7 +33,7 @@ class extends Component {
             ]);
         }
 
-        if (! (Auth::user()->companyStatus() === CompanyStatusEnum::APPROVED && Auth::user()->companyIsActive())) {
+        if (! (Auth::user()->companyStatus() === CompanyStatusEnum::APROBADO && Auth::user()->companyIsActive())) {
             Auth::logout();
 
             throw ValidationException::withMessages([

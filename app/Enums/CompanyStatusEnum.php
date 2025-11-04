@@ -8,34 +8,34 @@ use Filament\Support\Contracts\HasLabel;
 
 enum CompanyStatusEnum: int implements HasColor, HasIcon, HasLabel
 {
-    case PENDING = 1;
-    case APPROVED = 2;
-    case REJECTED = 3;
+    case PENDIENTE = 1;
+    case APROBADO = 2;
+    case RECHAZADO = 3;
 
     public function getLabel(): string
     {
         return match ($this) {
-            self::PENDING => 'Pendiente',
-            self::APPROVED => 'Aprobado',
-            self::REJECTED => 'Rechazado',
+            self::PENDIENTE => 'Pendiente',
+            self::APROBADO => 'Aprobado',
+            self::RECHAZADO => 'Rechazado',
         };
     }
 
     public function getColor(): string
     {
         return match ($this) {
-            self::PENDING => 'warning',
-            self::APPROVED => 'success',
-            self::REJECTED => 'danger',
+            self::PENDIENTE => 'warning',
+            self::APROBADO => 'success',
+            self::RECHAZADO => 'danger',
         };
     }
 
     public function getIcon(): string
     {
         return match ($this) {
-            self::PENDING => 'heroicon-o-clock',
-            self::APPROVED => 'heroicon-o-check-circle',
-            self::REJECTED => 'heroicon-o-x-circle',
+            self::PENDIENTE => 'heroicon-o-clock',
+            self::APROBADO => 'heroicon-o-check-circle',
+            self::RECHAZADO => 'heroicon-o-x-circle',
         };
     }
 }
