@@ -88,10 +88,6 @@ class CompanyResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('status')
-                    ->label('Estado')
-                    ->options(CompanyStatusEnum::class),
-
                 Tables\Filters\SelectFilter::make('type')
                     ->label('Tipo de Empresa')
                     ->options(CompanyTypeEnum::class),
