@@ -4,7 +4,7 @@ namespace App\Livewire\Forms;
 
 use App\Enums\{CompanyTypeEnum, CompanyDocumentTypeEnum};
 use App\Models\{Company, User, CompanyDocument};
-use Illuminate\Support\Facades\{DB, Hash, Storage};
+use Illuminate\Support\Facades\{DB, Hash, Log, Storage};
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -33,24 +33,26 @@ class CompanyForm extends Form
     public function validateStep(int $step)
     {
         $rules = [];
-
         switch ($step) {
             case 1: // Datos de la Empresa
                 $rules = [
-                    'ruc' => 'required|string|size:11|regex:/^\d{11}$/|unique:companies,ruc',
+                    'ruc' => [
+                        'required',
+                        'string',
+                        'size:11',
+                        'regex:/^\d{11}$/',
+                        'unique:companies,ruc',
+                        function ($attribute, $value, $fail) {
+                            if ($this->type === CompanyTypeEnum::NATURAL->value && !str_starts_with($value, '10')) {
+                                $fail('El RUC debe iniciar con 10 para personas naturales.');
+                            }
+                            if ($this->type === CompanyTypeEnum::JURIDICA->value && !str_starts_with($value, '20')) {
+                                $fail('El RUC debe iniciar con 20 para personas jurídicas.');
+                            }
+                        }
+                    ],
                     'business_name' => 'required|string|max:255',
                 ];
-                // Validar RUC según tipo
-                if ($this->type === CompanyTypeEnum::NATURAL->value && !str_starts_with($this->ruc, '10')) {
-                    throw \Illuminate\Validation\ValidationException::withMessages([
-                        'ruc' => 'El RUC debe iniciar con 10 para personas naturales.'
-                    ]);
-                }
-                if ($this->type === CompanyTypeEnum::JURIDICA->value && !str_starts_with($this->ruc, '20')) {
-                    throw \Illuminate\Validation\ValidationException::withMessages([
-                        'ruc' => 'El RUC debe iniciar con 20 para personas jurídicas.'
-                    ]);
-                }
                 break;
 
             case 2: // Datos del Representante
@@ -77,7 +79,6 @@ class CompanyForm extends Form
                 }
                 break;
         }
-
         if (!empty($rules)) {
             $this->validate($rules);
         }

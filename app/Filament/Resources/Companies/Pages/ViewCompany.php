@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\CompanyResource\Pages;
+namespace App\Filament\Resources\Companies\Pages;
 
 use App\Enums\CompanyDocumentStatusEnum;
 use App\Enums\CompanyDocumentTypeEnum;
 use App\Enums\CompanyTypeEnum;
-use App\Filament\Resources\CompanyResource;
+use App\Filament\Resources\Companies\CompanyResource;
 use App\Models\Company;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;

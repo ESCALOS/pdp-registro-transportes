@@ -2,7 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Filament\Resources\CompanyResource;
+use App\Filament\Resources\Companies\CompanyResource;
 use App\Models\Company;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;

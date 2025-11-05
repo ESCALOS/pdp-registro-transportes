@@ -24,7 +24,7 @@
 
                 <div class="info-item">
                     <span class="info-label">Representante Legal:</span>
-                    <span class="info-value">{{ $record->representative->name }}</span>
+                    <span class="info-value">{{ $record->representative->full_name }}</span>
                 </div>
 
                 @if($record->representative->email)
