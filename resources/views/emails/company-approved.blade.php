@@ -5,24 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Empresa Aprobada</title>
     <style>
+        .container {     
+            max-width: 56rem;
+        }
         body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
             color: #333;
             max-width: 600px;
+            justify-content: center;
+            display: flex;
             margin: 0 auto;
             padding: 20px;
         }
         .header {
             background-color: #10b981;
             color: white;
-            padding: 20px;
+            padding: 20px 30px;
+            max-width: 56rem;
             text-align: center;
             border-radius: 5px 5px 0 0;
         }
         .content {
             background-color: #f9f9f9;
             padding: 30px;
+            max-width: 100%;
             border: 1px solid #ddd;
             border-radius: 0 0 5px 5px;
         }
@@ -41,6 +48,7 @@
     </style>
 </head>
 <body>
+    <div class="container">
     <div class="header">
         <h1>¡Felicitaciones!</h1>
     </div>
@@ -69,6 +77,7 @@
     </div>
     <div class="footer">
         <p>Este es un correo automático, por favor no responder.</p>
+    </div>
     </div>
 </body>
 </html>
