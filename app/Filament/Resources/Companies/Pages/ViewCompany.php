@@ -6,12 +6,16 @@ use App\Enums\CompanyDocumentStatusEnum;
 use App\Enums\CompanyDocumentTypeEnum;
 use App\Enums\CompanyTypeEnum;
 use App\Filament\Resources\Companies\CompanyResource;
+use App\Mail\CompanyApprovedMail;
+use App\Mail\CompanyRejectedMail;
 use App\Models\Company;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class ViewCompany extends Page
 {
@@ -132,13 +136,45 @@ class ViewCompany extends Page
             if ($allApproved && $this->canApproveAll()) {
                 $this->record->update(['status' => 2]);
 
+                // Enviar correo de aprobación
+                if ($this->record->representative->email) {
+                    Mail::to($this->record->representative->email)
+                        ->send(new CompanyApprovedMail($this->record));
+                }
+
                 Notification::make()
                     ->title('Empresa Aprobada')
                     ->success()
                     ->body('Todos los documentos han sido aprobados y la empresa ha sido validada.')
                     ->send();
             } else {
-                $this->record->update(['status' => 3]);
+                // Generar token de apelación (válido por 30 días)
+                $appealToken = Str::random(64);
+                $expiresAt = now()->addDays(30);
+
+                $this->record->update([
+                    'status' => 3,
+                    'appeal_token' => $appealToken,
+                    'appeal_token_expires_at' => $expiresAt,
+                ]);
+
+                // Preparar lista de documentos rechazados
+                $rejectedDocuments = [];
+                foreach ($this->record->documents as $document) {
+                    if ($this->documentStatuses[$document->id] === CompanyDocumentStatusEnum::RECHAZADO->value) {
+                        $rejectedDocuments[] = [
+                            'type' => $document->type->getLabel(),
+                            'reason' => $this->rejectionReasons[$document->id] ?? 'No especificado'
+                        ];
+                    }
+                }
+
+                // Enviar correo de rechazo con enlace de apelación
+                if ($this->record->representative->email && !empty($rejectedDocuments)) {
+                    $appealUrl = route('company.appeal.show', $appealToken);
+                    Mail::to($this->record->representative->email)
+                        ->send(new CompanyRejectedMail($this->record, $rejectedDocuments, $appealUrl));
+                }
 
                 Notification::make()
                     ->title('Documentos Validados')
