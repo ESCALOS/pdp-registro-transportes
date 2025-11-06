@@ -17,12 +17,18 @@ class Driver extends Model
         'document_number',
         'name',
         'lastname',
+        'license_number',
+        'email',
+        'phone',
         'status',
+        'appeal_token',
+        'appeal_token_expires_at',
     ];
 
     protected $casts = [
         'document_type' => \App\Enums\DriverDocumentTypeEnum::class,
         'status' => \App\Enums\DriverStatusEnum::class,
+        'appeal_token_expires_at' => 'datetime',
     ];
 
     public function company()

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Empresa Aprobada</title>
+    <title>Conductor Aprobado</title>
     <style>
         .container {     
             max-width: 56rem;
@@ -33,7 +33,7 @@
             border: 1px solid #ddd;
             border-radius: 0 0 5px 5px;
         }
-        .company-info {
+        .driver-info {
             background-color: white;
             padding: 15px;
             margin: 20px 0;
@@ -53,20 +53,20 @@
         <h1>¡Felicitaciones!</h1>
     </div>
     <div class="content">
-        <p>Estimado/a <strong>{{ $company->representative->full_name }}</strong>,</p>
+        <p>Estimado/a <strong>{{ $driver->full_name }}</strong>,</p>
 
-        <p>Nos complace informarle que su empresa ha sido <strong>aprobada</strong> exitosamente.</p>
+        <p>Nos complace informarle que su registro como conductor ha sido <strong>aprobado</strong> exitosamente.</p>
 
-        <div class="company-info">
-            <strong>Datos de la empresa:</strong><br>
-            <strong>RUC:</strong> {{ $company->ruc }}<br>
-            <strong>Razón Social:</strong> {{ $company->business_name }}<br>
-            <strong>Tipo:</strong> {{ $company->type === 2 ? 'Persona Jurídica' : 'Persona Natural' }}
+        <div class="driver-info">
+            <strong>Datos del conductor:</strong><br>
+            <strong>Nombre:</strong> {{ $driver->full_name }}<br>
+            <strong>{{ $driver->document_type->getLabel() }}:</strong> {{ $driver->document_number }}<br>
+            <strong>Empresa:</strong> {{ $driver->company->business_name ?? 'N/A' }}
         </div>
 
-        <p>Todos los documentos han sido validados correctamente y su empresa está ahora activa en nuestro sistema.</p>
+        <p>Todos sus documentos han sido validados correctamente y ahora está activo en nuestro sistema.</p>
 
-        <p>Puede proceder a utilizar nuestros servicios.</p>
+        <p>Puede proceder a realizar sus actividades de transporte.</p>
 
         <p>Saludos cordiales,<br>
         <strong>Equipo de Registro de Transportes</strong></p>

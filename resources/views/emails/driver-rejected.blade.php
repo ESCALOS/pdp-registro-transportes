@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Empresa Rechazada</title>
+    <title>Documentos de Conductor Rechazados</title>
     <style>
         .container {     
             max-width: 56rem;
@@ -15,7 +15,6 @@
             color: #333;
             max-width: 600px;
             margin: 0 auto;
-
             padding: 20px;
         }
         .header {
@@ -32,7 +31,7 @@
             border: 1px solid #ddd;
             border-radius: 0 0 5px 5px;
         }
-        .company-info {
+        .driver-info {
             background-color: white;
             padding: 15px;
             margin: 20px 0;
@@ -64,15 +63,15 @@
             <h1>Documentos Requieren Corrección</h1>
         </div>
         <div class="content">
-            <p>Estimado/a <strong>{{ $company->representative->full_name }}</strong>,</p>
+            <p>Estimado/a <strong>{{ $driver->full_name }}</strong>,</p>
             
-            <p>Le informamos que su solicitud de registro requiere correcciones en los siguientes documentos:</p>
+            <p>Le informamos que su solicitud de registro como conductor requiere correcciones en los siguientes documentos:</p>
             
-            <div class="company-info">
-                <strong>Datos de la empresa:</strong><br>
-                <strong>RUC:</strong> {{ $company->ruc }}<br>
-                <strong>Razón Social:</strong> {{ $company->business_name }}<br>
-                <strong>Tipo:</strong> {{ $company->type === 2 ? 'Persona Jurídica' : 'Persona Natural' }}
+            <div class="driver-info">
+                <strong>Datos del conductor:</strong><br>
+                <strong>Nombre:</strong> {{ $driver->full_name }}<br>
+                <strong>{{ $driver->document_type->getLabel() }}:</strong> {{ $driver->document_number }}<br>
+                <strong>Empresa:</strong> {{ $driver->company->business_name ?? 'N/A' }}
             </div>
             
             <div class="rejection-list">
@@ -85,6 +84,7 @@
                 @endforeach
             </div>
             
+            @if($appealUrl)
             <p>Para corregir y volver a enviar sus documentos, haga clic en el siguiente botón:</p>
             
             <div style="text-align: center; margin: 30px 0;">
@@ -96,6 +96,9 @@
             <p style="font-size: 14px; color: #666;">
                 <strong>Nota:</strong> Este enlace estará disponible por 30 días. Si tiene alguna duda, no dude en contactarnos.
             </p>
+            @else
+            <p>Por favor, ingrese al sistema para corregir y volver a enviar sus documentos.</p>
+            @endif
             
             <p>Saludos cordiales,<br>
             <strong>Equipo de Registro de Transportes</strong></p>

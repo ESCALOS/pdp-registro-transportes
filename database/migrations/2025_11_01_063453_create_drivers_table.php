@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('document_number', 20);
             $table->string('name');
             $table->string('lastname');
-            $table->integer('status')->default(1)->comment('1: Inactivo, 2: Activo, 3: Necesita Actualización');
+            $table->integer('status')->default(1)->comment('1: Inactivo, 2: Activo, 3: Necesita Actualización, 4: Espera de aprobación, 5: Revisión Documentos, 6: Documentos Infectados');
             $table->timestamps();
             $table->softDeletes();
 
