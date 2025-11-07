@@ -28,6 +28,90 @@
                     <span class="info-label">Fecha de Registro:</span>
                     <span class="info-value">{{ $record->created_at->format('d/m/Y H:i') }}</span>
                 </div>
+
+                @if($record->vehicle_type)
+                <div class="info-item">
+                    <span class="info-label">Tipo de Vehículo:</span>
+                    <span class="info-value">{{ $record->vehicle_type }}</span>
+                </div>
+                @endif
+
+                @if($record->axle_count)
+                <div class="info-item">
+                    <span class="info-label">Número de Ejes:</span>
+                    <span class="info-value">{{ $record->axle_count }}</span>
+                </div>
+                @endif
+
+                @if($record->tare)
+                <div class="info-item">
+                    <span class="info-label">Tara:</span>
+                    <span class="info-value">{{ number_format($record->tare, 2) }} ton</span>
+                </div>
+                @endif
+
+                @if($record->safe_weight)
+                <div class="info-item">
+                    <span class="info-label">Peso Seguro:</span>
+                    <span class="info-value">{{ number_format($record->safe_weight, 2) }} ton</span>
+                </div>
+                @endif
+
+                @if($record->height)
+                <div class="info-item">
+                    <span class="info-label">Alto:</span>
+                    <span class="info-value">{{ number_format($record->height, 2) }} m</span>
+                </div>
+                @endif
+
+                @if($record->length)
+                <div class="info-item">
+                    <span class="info-label">Largo:</span>
+                    <span class="info-value">{{ number_format($record->length, 2) }} m</span>
+                </div>
+                @endif
+
+                @if($record->width)
+                <div class="info-item">
+                    <span class="info-label">Ancho:</span>
+                    <span class="info-value">{{ number_format($record->width, 2) }} m</span>
+                </div>
+                @endif
+
+                @if($record->material)
+                <div class="info-item">
+                    <span class="info-label">Material:</span>
+                    <span class="info-value">{{ $record->material }}</span>
+                </div>
+                @endif
+
+                <div class="info-item">
+                    <span class="info-label">¿Está Aislado?:</span>
+                    <x-filament::badge :color="$record->is_insulated ? 'success' : 'gray'">
+                        {{ $record->is_insulated ? 'Sí' : 'No' }}
+                    </x-filament::badge>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">¿Tiene Bonificación?:</span>
+                    <x-filament::badge :color="$record->has_bonus ? 'success' : 'gray'">
+                        {{ $record->has_bonus ? 'Sí' : 'No' }}
+                    </x-filament::badge>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">¿Acepta 20'?:</span>
+                    <x-filament::badge :color="$record->accepts_20ft ? 'success' : 'gray'">
+                        {{ $record->accepts_20ft ? 'Sí' : 'No' }}
+                    </x-filament::badge>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">¿Acepta 40'?:</span>
+                    <x-filament::badge :color="$record->accepts_40ft ? 'success' : 'gray'">
+                        {{ $record->accepts_40ft ? 'Sí' : 'No' }}
+                    </x-filament::badge>
+                </div>
             </div>
         </div>
 

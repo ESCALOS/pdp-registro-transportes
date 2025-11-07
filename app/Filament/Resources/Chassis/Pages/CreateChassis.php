@@ -12,8 +12,8 @@ class CreateChassis extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // Establecer estado inicial como INACTIVE (valor 1)
-        $data['status'] = ChassisStatusEnum::INACTIVE;
+        // Establecer estado inicial como DOCUMENT_REVIEW (valor 5)
+        $data['status'] = ChassisStatusEnum::DOCUMENT_REVIEW;
 
         return $data;
     }

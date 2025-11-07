@@ -70,8 +70,8 @@
             <div class="chassis-info">
                 <strong>Datos del chassis:</strong><br>
                 <strong>Placa:</strong> {{ $chassis->license_plate }}<br>
-                <strong>Marca:</strong> {{ $chassis->brand }}<br>
-                <strong>Modelo:</strong> {{ $chassis->model }}<br>
+                <strong>Tipo de Vehículo:</strong> {{ $chassis->vehicle_type ?? 'N/A' }}<br>
+                <strong>Cantidad de Ejes:</strong> {{ $chassis->axle_count ?? 'N/A' }}<br>
                 <strong>Empresa:</strong> {{ $chassis->company->business_name ?? 'N/A' }}
             </div>
             

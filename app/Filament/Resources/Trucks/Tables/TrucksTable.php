@@ -80,6 +80,7 @@ class TrucksTable
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->poll('5s');
     }
 }

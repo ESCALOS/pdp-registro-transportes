@@ -26,6 +26,28 @@ class ChassisTable
                     ->label(__('License Plate'))
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('vehicle_type')
+                    ->label(__('Tipo de Vehículo'))
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('axle_count')
+                    ->label(__('N° Ejes'))
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('tare')
+                    ->label(__('Tara (ton)'))
+                    ->numeric(decimalPlaces: 2)
+                    ->suffix(' ton')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('safe_weight')
+                    ->label(__('Peso Seguro (ton)'))
+                    ->numeric(decimalPlaces: 2)
+                    ->suffix(' ton')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('documents_count')
                     ->label(__('Documents'))
                     ->counts('documents')
@@ -65,6 +87,7 @@ class ChassisTable
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->poll('5s');
     }
 }

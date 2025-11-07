@@ -58,8 +58,59 @@ class TruckForm extends Form
         ];
     }
 
+    private function getRequiredDocuments(): array
+    {
+        return ['tarjeta_propiedad', 'soat', 'poliza_seguro', 'bonificacion', 'habilitacion_mtc', 'revision_tecnica'];
+    }
+
+    public function validateDocuments(): array
+    {
+        $errors = [];
+        $requiredDocs = $this->getRequiredDocuments();
+        
+        foreach ($requiredDocs as $docKey) {
+            // Validar que el documento esté adjunto
+            if (empty($this->documents[$docKey])) {
+                $errors["documents.{$docKey}"] = $this->getDocumentLabel($docKey) . ' es obligatorio.';
+            }
+            
+            // Validar que tenga fecha de vencimiento
+            if (empty($this->document_dates[$docKey])) {
+                $errors["document_dates.{$docKey}"] = 'La fecha de vencimiento de ' . $this->getDocumentLabel($docKey) . ' es obligatoria.';
+            }
+        }
+        
+        return $errors;
+    }
+
+    private function getDocumentLabel(string $key): string
+    {
+        return match($key) {
+            'tarjeta_propiedad' => 'Tarjeta de Propiedad',
+            'soat' => 'SOAT',
+            'poliza_seguro' => 'Póliza de Seguro',
+            'bonificacion' => 'Bonificación',
+            'habilitacion_mtc' => 'Habilitación MTC',
+            'revision_tecnica' => 'Revisión Técnica',
+            default => $key,
+        };
+    }
+
     public function save(): Truck
     {
+        // Validar datos básicos
+        $this->validate();
+        
+        // Validar documentos obligatorios
+        $documentErrors = $this->validateDocuments();
+        if (!empty($documentErrors)) {
+            foreach ($documentErrors as $key => $message) {
+                // Agregar prefijo 'form.' para que coincida con la vista Livewire
+                $this->addError('form.' . $key, $message);
+            }
+            throw new \Exception('Por favor, complete todos los documentos obligatorios y sus fechas de vencimiento.');
+        }
+        
         return DB::transaction(function () {
             // Create truck
             $truck = Truck::create([

@@ -585,6 +585,15 @@ class extends Component {
     color: #9ca3af;
 }
 
+.form-control-custom.is-invalid {
+    border-color: #dc2626;
+}
+
+.form-control-custom.is-invalid:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
 .form-hint {
     display: block;
     margin-top: 6px;
@@ -1024,7 +1033,7 @@ class extends Component {
                     <button type="button" class="btn-close-custom" wire:click="closeModal" aria-label="Cerrar">×</button>
                 </div>
                 <div class="modal-body-custom">
-                    <p class="modal-description">Completa todos los datos del chassis. El estado iniciará como "Inactivo" para revisión del administrador.</p>
+                    <p class="modal-description">Completa todos los datos del chassis. El estado iniciará como "En espera de aprobación" para revisión del administrador.</p>
 
                     <div class="tabs-container">
                         <button 
@@ -1049,8 +1058,8 @@ class extends Component {
                                 <strong>Completa la información.</strong> Los campos con * son obligatorios.
                             </div>
                             <form>
-                                <div class="row">
-                                    <div class="col-md-12 mb-3">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                                    <div>
                                         <label class="form-label-custom">Placa <span class="text-danger">*</span></label>
                                         <input 
                                             type="text" 
@@ -1072,6 +1081,169 @@ class extends Component {
                                                 </small>
                                             </div>
                                         @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label-custom">Tipo de Vehículo <span class="text-danger">*</span></label>
+                                        <input 
+                                            type="text" 
+                                            wire:model="form.vehicle_type"
+                                            class="form-control-custom @error('form.vehicle_type') is-invalid @enderror" 
+                                            placeholder="Ej: Tolva, Plataforma, etc.">
+                                        @error('form.vehicle_type')
+                                            <small class="text-danger">{{ $message }}</small>
+                                        @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label-custom">Número de Ejes</label>
+                                        <input 
+                                            type="number" 
+                                            wire:model="form.axle_count"
+                                            class="form-control-custom @error('form.axle_count') is-invalid @enderror" 
+                                            placeholder="Ej: 2, 3, 4..."
+                                            min="1"
+                                            max="10">
+                                        <small class="form-hint">Cantidad de ejes del chassis</small>
+                                        @error('form.axle_count')
+                                            <small class="text-danger">{{ $message }}</small>
+                                        @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label-custom">Tara (toneladas)</label>
+                                        <input 
+                                            type="number" 
+                                            wire:model="form.tare"
+                                            class="form-control-custom @error('form.tare') is-invalid @enderror" 
+                                            placeholder="Ej: 8.5"
+                                            step="0.01"
+                                            min="0">
+                                        <small class="form-hint">Peso del chassis vacío</small>
+                                        @error('form.tare')
+                                            <small class="text-danger">{{ $message }}</small>
+                                        @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label-custom">Peso Seguro (toneladas)</label>
+                                        <input 
+                                            type="number" 
+                                            wire:model="form.safe_weight"
+                                            class="form-control-custom @error('form.safe_weight') is-invalid @enderror" 
+                                            placeholder="Ej: 25.0"
+                                            step="0.01"
+                                            min="0">
+                                        <small class="form-hint">Peso máximo permitido</small>
+                                        @error('form.safe_weight')
+                                            <small class="text-danger">{{ $message }}</small>
+                                        @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label-custom">Alto (metros)</label>
+                                        <input 
+                                            type="number" 
+                                            wire:model="form.height"
+                                            class="form-control-custom @error('form.height') is-invalid @enderror" 
+                                            placeholder="Ej: 2.5"
+                                            step="0.01"
+                                            min="0">
+                                        @error('form.height')
+                                            <small class="text-danger">{{ $message }}</small>
+                                        @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label-custom">Largo (metros)</label>
+                                        <input 
+                                            type="number" 
+                                            wire:model="form.length"
+                                            class="form-control-custom @error('form.length') is-invalid @enderror" 
+                                            placeholder="Ej: 12.0"
+                                            step="0.01"
+                                            min="0">
+                                        @error('form.length')
+                                            <small class="text-danger">{{ $message }}</small>
+                                        @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label-custom">Ancho (metros)</label>
+                                        <input 
+                                            type="number" 
+                                            wire:model="form.width"
+                                            class="form-control-custom @error('form.width') is-invalid @enderror" 
+                                            placeholder="Ej: 2.4"
+                                            step="0.01"
+                                            min="0">
+                                        @error('form.width')
+                                            <small class="text-danger">{{ $message }}</small>
+                                        @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label-custom">Material</label>
+                                        <input 
+                                            type="text" 
+                                            wire:model="form.material"
+                                            class="form-control-custom @error('form.material') is-invalid @enderror" 
+                                            placeholder="Ej: Acero, Aluminio, etc.">
+                                        @error('form.material')
+                                            <small class="text-danger">{{ $message }}</small>
+                                        @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label-custom d-block">¿Está Aislado?</label>
+                                        <div class="form-check">
+                                            <input 
+                                                class="form-check-input" 
+                                                type="checkbox" 
+                                                wire:model="form.is_insulated"
+                                                id="is_insulated"
+                                                value="1">
+                                            <label class="form-check-label" for="is_insulated">Sí</label>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label-custom d-block">¿Tiene Bonificación?</label>
+                                        <div class="form-check">
+                                            <input 
+                                                class="form-check-input" 
+                                                type="checkbox" 
+                                                wire:model="form.has_bonus"
+                                                id="has_bonus"
+                                                value="1">
+                                            <label class="form-check-label" for="has_bonus">Sí</label>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label-custom d-block">¿Acepta 20'?</label>
+                                        <div class="form-check">
+                                            <input 
+                                                class="form-check-input" 
+                                                type="checkbox" 
+                                                wire:model="form.accepts_20ft"
+                                                id="accepts_20ft"
+                                                value="1">
+                                            <label class="form-check-label" for="accepts_20ft">Sí</label>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label-custom d-block">¿Acepta 40'?</label>
+                                        <div class="form-check">
+                                            <input 
+                                                class="form-check-input" 
+                                                type="checkbox" 
+                                                wire:model="form.accepts_40ft"
+                                                id="accepts_40ft"
+                                                value="1">
+                                            <label class="form-check-label" for="accepts_40ft">Sí</label>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
@@ -1115,8 +1287,11 @@ class extends Component {
                                                 <input 
                                                     type="file" 
                                                     wire:model="form.documents.{{ $doc['key'] }}"
-                                                    class="form-control-custom" 
+                                                    class="form-control-custom @error('form.documents.' . $doc['key']) is-invalid @enderror" 
                                                     accept=".pdf,.jpg,.jpeg,.png">
+                                                @error('form.documents.' . $doc['key'])
+                                                    <div class="text-danger mt-1" style="font-size: 0.85rem;">{{ $message }}</div>
+                                                @enderror
                                                 <small class="form-hint">PDF, JPG o PNG (máx 10MB)</small>
                                             </div>
                                             <div class="col-md-5 mb-3">
@@ -1124,7 +1299,11 @@ class extends Component {
                                                 <input 
                                                     type="date" 
                                                     wire:model="form.document_dates.{{ $doc['key'] }}"
-                                                    class="form-control-custom">
+                                                    class="form-control-custom @error('form.document_dates.' . $doc['key']) is-invalid @enderror"
+                                                    min="{{ date('Y-m-d') }}">
+                                                @error('form.document_dates.' . $doc['key'])
+                                                    <div class="text-danger mt-1" style="font-size: 0.85rem;">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                         </div>
                                     </div>
@@ -1144,10 +1323,8 @@ class extends Component {
                     <button 
                         type="button" 
                         class="btn-submit" 
-                        wire:click="save"
-                        wire:loading.attr="disabled">
-                        <span wire:loading.remove>Registrar</span>
-                        <span wire:loading>Guardando...</span>
+                        wire:click="save">
+                        <span>Registrar</span>
                     </button>
                 </div>
             </div>
@@ -1172,12 +1349,58 @@ class extends Component {
                         <i class="bi bi-box-seam"></i> Datos del Chassis
                     </h5>
                     <div class="info-card">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <div class="info-item">
-                                    <label class="info-label">Placa</label>
-                                    <p class="info-value">{{ $selectedChassis->license_plate }}</p>
-                                </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label class="info-label">Placa</label>
+                                <p class="info-value">{{ $selectedChassis->license_plate }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Tipo de Vehículo</label>
+                                <p class="info-value">{{ $selectedChassis->vehicle_type ?? 'N/A' }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Cantidad de Ejes</label>
+                                <p class="info-value">{{ $selectedChassis->axle_count ?? 'N/A' }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Bonificación</label>
+                                <p class="info-value">{{ $selectedChassis->has_bonus ? 'Sí' : 'No' }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Tara (kg)</label>
+                                <p class="info-value">{{ $selectedChassis->tare ? number_format($selectedChassis->tare, 2) : 'N/A' }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Peso Seguro (kg)</label>
+                                <p class="info-value">{{ $selectedChassis->safe_weight ? number_format($selectedChassis->safe_weight, 2) : 'N/A' }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Alto (m)</label>
+                                <p class="info-value">{{ $selectedChassis->height ? number_format($selectedChassis->height, 2) : 'N/A' }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Largo (m)</label>
+                                <p class="info-value">{{ $selectedChassis->length ? number_format($selectedChassis->length, 2) : 'N/A' }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Ancho (m)</label>
+                                <p class="info-value">{{ $selectedChassis->width ? number_format($selectedChassis->width, 2) : 'N/A' }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Aislado</label>
+                                <p class="info-value">{{ $selectedChassis->is_insulated ? 'Sí' : 'No' }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Material</label>
+                                <p class="info-value">{{ $selectedChassis->material ?? 'N/A' }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Acepta 20ft</label>
+                                <p class="info-value">{{ $selectedChassis->accepts_20ft ? 'Sí' : 'No' }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Acepta 40ft</label>
+                                <p class="info-value">{{ $selectedChassis->accepts_40ft ? 'Sí' : 'No' }}</p>
                             </div>
                         </div>
                     </div>

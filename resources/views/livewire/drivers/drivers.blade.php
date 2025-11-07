@@ -604,6 +604,15 @@ class extends Component {
     color: #9ca3af;
 }
 
+.form-control-custom.is-invalid {
+    border-color: #dc2626;
+}
+
+.form-control-custom.is-invalid:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
 .form-hint {
     display: block;
     margin-top: 6px;
@@ -1338,8 +1347,11 @@ class extends Component {
                                                 <input 
                                                     type="file" 
                                                     wire:model="form.documents.{{ $doc['key'] }}"
-                                                    class="form-control-custom" 
+                                                    class="form-control-custom @error('form.documents.' . $doc['key']) is-invalid @enderror" 
                                                     accept=".pdf,.jpg,.jpeg,.png">
+                                                @error('form.documents.' . $doc['key'])
+                                                    <div class="text-danger mt-1" style="font-size: 0.85rem;">{{ $message }}</div>
+                                                @enderror
                                                 <small class="form-hint">PDF, JPG o PNG (máx 10MB)</small>
                                             </div>
                                             <div class="col-md-5 mb-3">
@@ -1347,7 +1359,11 @@ class extends Component {
                                                 <input 
                                                     type="date" 
                                                     wire:model="form.document_dates.{{ $doc['key'] }}"
-                                                    class="form-control-custom">
+                                                    class="form-control-custom @error('form.document_dates.' . $doc['key']) is-invalid @enderror"
+                                                    min="{{ date('Y-m-d') }}">
+                                                @error('form.document_dates.' . $doc['key'])
+                                                    <div class="text-danger mt-1" style="font-size: 0.85rem;">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                         </div>
                                     </div>
@@ -1368,10 +1384,8 @@ class extends Component {
                         type="button" 
                         class="btn-submit" 
                         wire:click="save"
-                        onclick="console.log('Button clicked')"
-                        wire:loading.attr="disabled">
-                        <span wire:loading.remove>Registrar</span>
-                        <span wire:loading>Guardando...</span>
+                        onclick="console.log('Button clicked')">
+                        <span>Registrar</span>
                     </button>
                 </div>
             </div>
@@ -1454,6 +1468,7 @@ class extends Component {
                                         {{ $document->expiration_date->format('d/m/Y') }}
                                         @if($document->expiration_date->isPast())
                                             <span class="badge bg-danger ms-2">Vencido</span>
+                                        @endif
                                     @else
                                         <span class="text-muted">Sin vencimiento</span>
                                     @endif
