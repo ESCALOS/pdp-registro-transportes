@@ -13,6 +13,7 @@ use App\Filament\Resources\Companies\Pages\ViewCompany;
 use Filament\Schemas\Schema;
 use App\Models\Company;
 use BackedEnum;
+use UnitEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -33,6 +34,8 @@ class CompanyResource extends Resource
     protected static ?string $modelLabel = 'Empresa';
 
     protected static ?string $pluralModelLabel = 'Empresas';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Gestión de Transporte';
 
     public static function form(Schema $schema): Schema
     {

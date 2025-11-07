@@ -59,6 +59,7 @@ class CompaniesTable
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->poll('5s');
     }
 }

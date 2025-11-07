@@ -1,18 +1,19 @@
 <?php
 
-namespace App\Filament\Resources\Drivers\Tables;
+namespace App\Filament\Resources\Trucks\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
-class DriversTable
+class TrucksTable
 {
     public static function configure(Table $table): Table
     {
@@ -22,27 +23,29 @@ class DriversTable
                     ->label(__('Company'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('document_type')
-                    ->label(__('Document Type'))
-                    ->badge()
+                TextColumn::make('license_plate')
+                    ->label(__('Placa'))
+                    ->searchable()
                     ->sortable(),
-                TextColumn::make('document_number')
-                    ->label(__('Document Number'))
-                    ->searchable(),
-                TextColumn::make('name')
-                    ->label(__('Name'))
-                    ->searchable(),
-                TextColumn::make('lastname')
-                    ->label(__('Lastname'))
-                    ->searchable(),
-                // TextColumn::make('license_number')
-                //     ->label(__('License Number'))
-                //     ->searchable(),
+                TextColumn::make('truck_type')
+                    ->label(__('Tipo'))
+                    ->badge()
+                    ->color('info')
+                    ->searchable()
+                    ->toggleable(),
+                IconColumn::make('is_internal')
+                    ->label(__('Interno'))
+                    ->boolean()
+                    ->toggleable(),
+                IconColumn::make('has_bonus')
+                    ->label(__('Bonificación'))
+                    ->boolean()
+                    ->toggleable(),
                 TextColumn::make('documents_count')
                     ->label(__('Documents'))
                     ->counts('documents')
                     ->badge()
-                    ->color('info')
+                    ->color('warning')
                     ->sortable(),
                 TextColumn::make('status')
                     ->label(__('Status'))

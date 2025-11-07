@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Filament\Resources\Drivers\Tables;
+namespace App\Filament\Resources\Chassis\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
-class DriversTable
+class ChassisTable
 {
     public static function configure(Table $table): Table
     {
@@ -22,22 +22,32 @@ class DriversTable
                     ->label(__('Company'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('document_type')
-                    ->label(__('Document Type'))
-                    ->badge()
+                TextColumn::make('license_plate')
+                    ->label(__('License Plate'))
+                    ->searchable()
                     ->sortable(),
-                TextColumn::make('document_number')
-                    ->label(__('Document Number'))
-                    ->searchable(),
-                TextColumn::make('name')
-                    ->label(__('Name'))
-                    ->searchable(),
-                TextColumn::make('lastname')
-                    ->label(__('Lastname'))
-                    ->searchable(),
-                // TextColumn::make('license_number')
-                //     ->label(__('License Number'))
-                //     ->searchable(),
+                TextColumn::make('vehicle_type')
+                    ->label(__('Tipo de Vehículo'))
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('axle_count')
+                    ->label(__('N° Ejes'))
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('tare')
+                    ->label(__('Tara (ton)'))
+                    ->numeric(decimalPlaces: 2)
+                    ->suffix(' ton')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('safe_weight')
+                    ->label(__('Peso Seguro (ton)'))
+                    ->numeric(decimalPlaces: 2)
+                    ->suffix(' ton')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('documents_count')
                     ->label(__('Documents'))
                     ->counts('documents')

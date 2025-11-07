@@ -143,7 +143,7 @@ class extends Component {
 
             <!-- Forgot Password Link -->
             <div class="text-center">
-                <a href="#" class="text-sm text-blue-600 hover:text-blue-800 hover:underline">
+                <a href="{{ route('password.request') }}" wire:navigate class="text-sm text-blue-600 hover:text-blue-800 hover:underline">
                     ¿Olvidó su contraseña?
                 </a>
             </div>

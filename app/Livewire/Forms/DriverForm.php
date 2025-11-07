@@ -56,8 +56,61 @@ class DriverForm extends Form
         ];
     }
 
+    private function getRequiredDocuments(): array
+    {
+        return ['dni', 'licencia', 'pbip', 'seg_portuaria', 'sctr', 'induc', 'decla'];
+    }
+
+    public function validateDocuments(): array
+    {
+        $errors = [];
+        $requiredDocs = $this->getRequiredDocuments();
+        
+        foreach ($requiredDocs as $docKey) {
+            // Validar que el documento esté adjunto
+            if (empty($this->documents[$docKey])) {
+                $errors["documents.{$docKey}"] = $this->getDocumentLabel($docKey) . ' es obligatorio.';
+            }
+            
+            // Validar que tenga fecha de vencimiento
+            if (empty($this->document_dates[$docKey])) {
+                $errors["document_dates.{$docKey}"] = 'La fecha de vencimiento de ' . $this->getDocumentLabel($docKey) . ' es obligatoria.';
+            }
+        }
+        
+        return $errors;
+    }
+
+    private function getDocumentLabel(string $key): string
+    {
+        return match($key) {
+            'dni' => 'DNI',
+            'licencia' => 'Licencia de conducir',
+            'pbip' => 'Certificado PBIP',
+            'seg_portuaria' => 'Certificado de Seguridad Portuaria',
+            'merc_peligrosas' => 'Certificado de Mercancías Peligrosas',
+            'sctr' => 'SCTR',
+            'induc' => 'Inducción de seguridad',
+            'decla' => 'Declaración Jurada',
+            default => $key,
+        };
+    }
+
     public function save(): Driver
     {
+        // Validar datos básicos
+        $this->validate();
+        
+        // Validar documentos obligatorios
+        $documentErrors = $this->validateDocuments();
+        if (!empty($documentErrors)) {
+            foreach ($documentErrors as $key => $message) {
+                // Agregar prefijo 'form.' para que coincida con la vista Livewire
+                $this->addError('form.' . $key, $message);
+            }
+            throw new \Exception('Por favor, complete todos los documentos obligatorios y sus fechas de vencimiento.');
+        }
+        
         return DB::transaction(function () {
             // Create driver
             $driver = Driver::create([
