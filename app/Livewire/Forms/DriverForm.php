@@ -4,7 +4,7 @@ namespace App\Livewire\Forms;
 
 use App\Enums\{DriverStatusEnum, DocumentTypeEnum};
 use App\Models\{Driver, Document};
-use Illuminate\Support\Facades\{DB, Storage};
+use Illuminate\Support\Facades\{Auth, DB, Log, Storage};
 use Livewire\Form;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
@@ -14,10 +14,42 @@ class DriverForm extends Form
     public string $name = '';
     public string $lastname = '';
     public string $license_number = '';
-    
+
     // Documents
     public $documents = [];
     public $document_dates = [];
+
+    public function initializeDocuments()
+    {
+        $this->documents = [
+            'dni' => null,
+            'licencia' => null,
+            'pbip' => null,
+            'seg_portuaria' => null,
+            'merc_peligrosas' => null,
+            'sctr' => null,
+            'induc' => null,
+            'decla' => null,
+        ];
+
+        $this->document_dates = [
+            'dni' => '',
+            'licencia' => '',
+            'pbip' => '',
+            'seg_portuaria' => '',
+            'merc_peligrosas' => '',
+            'sctr' => '',
+            'induc' => '',
+            'decla' => '',
+        ];
+    }
+
+    public function resetForm()
+    {
+        $this->reset();
+        $this->initializeDocuments();
+        $this->resetValidation();
+    }
 
     public function rules()
     {
@@ -27,10 +59,10 @@ class DriverForm extends Form
                 'string',
                 'max:20',
                 function ($attribute, $value, $fail) {
-                    $exists = Driver::where('company_id', auth()->user()->company_id)
+                    $exists = Driver::where('company_id', Auth::user()->company_id)
                         ->where('document_number', $value)
                         ->exists();
-                    
+
                     if ($exists) {
                         $fail('Ya existe un conductor registrado con este número de documento en esta empresa.');
                     }
@@ -56,6 +88,25 @@ class DriverForm extends Form
         ];
     }
 
+    public function checkDuplicate()
+    {
+        Log::info('checkDuplicate called with: ' . $this->document_number);
+
+        $this->resetErrorBag('form.document_number');
+
+        if (strlen($this->document_number) >= 8) {
+            $exists = Driver::where('company_id', Auth::user()->company_id)
+                ->where('document_number', $this->document_number)
+                ->exists();
+
+            Log::info('Driver exists: ' . ($exists ? 'YES' : 'NO'));
+
+            if ($exists) {
+                $this->addError('form.document_number', 'Ya existe un conductor registrado con este número de documento en esta empresa.');
+            }
+        }
+    }
+
     public function save(): Driver
     {
         return DB::transaction(function () {
@@ -65,7 +116,7 @@ class DriverForm extends Form
                 'name' => $this->name,
                 'lastname' => $this->lastname,
                 'license_number' => $this->license_number,
-                'company_id' => auth()->user()->company_id,
+                'company_id' => Auth::user()->company_id,
                 'document_type' => 1, // DNI
                 'status' => DriverStatusEnum::DOCUMENT_REVIEW->value,
             ]);
@@ -84,7 +135,7 @@ class DriverForm extends Form
     private function saveDocument(Driver $driver, string $type, TemporaryUploadedFile $file, ?string $expirationDate)
     {
         $documentTypeEnum = $this->mapDocumentType($type);
-        
+
         if (!$documentTypeEnum) {
             return;
         }

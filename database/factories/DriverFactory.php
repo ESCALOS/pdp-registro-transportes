@@ -17,7 +17,17 @@ class DriverFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'company_id' => 1,
+            'document_type' => fake()->randomElement([1, 2]),
+            'document_number' => fake()->numerify('########'),
+            'name' => fake()->firstName(),
+            'lastname' => fake()->lastName(),
+            'license_number' => fake()->numerify('Q########'),
+            'email' => fake()->unique()->safeEmail(),
+            'phone' => fake()->numerify('9########'),
+            'status' => fake()->randomElement([1, 2, 3, 4, 5, 6]),
+            'appeal_token' => null,
+            'appeal_token_expires_at' => null,
         ];
     }
 }

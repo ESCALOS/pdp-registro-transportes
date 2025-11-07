@@ -2,8 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
-use App\Http\Controllers\CompanyController;
-use App\Models\Driver;
 
 // Rutas públicas para apelación de empresas rechazadas
 Route::get('/company/appeal/{token}', [App\Http\Controllers\CompanyAppealController::class, 'show'])
@@ -34,7 +32,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Volt::route('dashboard', 'dashboard')
         ->name('dashboard');
-    
+
     Volt::route('drivers', 'drivers.drivers')
         ->name('drivers');
 });

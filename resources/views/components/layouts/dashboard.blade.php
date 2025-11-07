@@ -18,7 +18,7 @@
                     @endif
                 </div>
 
-                <button onclick="document.getElementById('logout-form').submit();" aria-label="Cerrar sesión" class="ml-4 inline-flex items-center gap-2 bg-white px-4 py-2 rounded-md font-semibold shadow-sm hover:bg-white/90 transition-colors focus:outline-none focus:ring-2 focus:ring-white/30" style="color: #8B2D23;">Cerrar sesión</button>
+                <button onclick="document.getElementById('logout-form').submit();" aria-label="Cerrar sesión" class="ml-4 inline-flex items-center gap-2 bg-white px-4 py-2 rounded-md font-semibold shadow-sm hover:bg-white/90 transition-colors focus:outline-none focus:ring-2 focus:ring-white/30 text-[#8B2D23]">Cerrar sesión</button>
                 <form id="logout-form" method="POST" action="{{ route('logout') }}" style="display:none">@csrf</form>
             @else
                 <img src="{{ asset('images/logo-pdp.webp') }}" alt="{{ config('app.name') }} Logo" class="h-12" />
