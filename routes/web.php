@@ -37,6 +37,14 @@ Route::put('/chassis/appeal/{token}', [App\Http\Controllers\ChassisAppealControl
 Route::get('/chassis/appeal-success', [App\Http\Controllers\ChassisAppealController::class, 'success'])
     ->name('chassis.appeal.success');
 
+// Rutas públicas para restablecimiento de contraseña
+Route::get('/password/reset/{token}', [App\Http\Controllers\PasswordResetController::class, 'show'])
+    ->name('password.reset.show');
+Route::put('/password/reset/{token}', [App\Http\Controllers\PasswordResetController::class, 'update'])
+    ->name('password.reset.update');
+Route::get('/password/reset-success', [App\Http\Controllers\PasswordResetController::class, 'success'])
+    ->name('password.reset.success');
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -45,6 +53,9 @@ Route::get('/', function () {
 Route::middleware('guest')->group(function () {
     Volt::route('registrar-empresa', 'company.register')
         ->name('company.register');
+    
+    Volt::route('olvide-contrasena', 'auth.forgot-password')
+        ->name('password.request');
 });
 
 Route::middleware('auth')->group(function () {
