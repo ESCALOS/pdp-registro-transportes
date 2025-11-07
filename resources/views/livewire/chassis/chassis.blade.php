@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\Driver;
-use App\Enums\DriverStatusEnum;
-use App\Livewire\Forms\DriverForm;
+use App\Models\Chassis;
+use App\Enums\ChassisStatusEnum;
+use App\Livewire\Forms\ChassisForm;
 use Livewire\Attributes\{Layout, Title, Computed};
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
@@ -10,19 +10,19 @@ use Livewire\WithFileUploads;
 
 new
 #[Layout('components.layouts.dashboard')]
-#[Title('Gestión de Conductores')]
+#[Title('Gestión de Chassis')]
 
 class extends Component {
     use WithPagination, WithFileUploads;
     
-    public DriverForm $form;
+    public ChassisForm $form;
     public $search = '';
     public $perPage = 10;
     public $statusFilter = '';
     public $showModal = false;
     
     // Tab control
-    public $activeTab = 'personal';
+    public $activeTab = 'chassis';
     
     public function mount()
     {
@@ -32,39 +32,25 @@ class extends Component {
     public function initializeDocuments()
     {
         $this->form->documents = [
-            'dni' => null,
-            'licencia' => null,
-            'pbip' => null,
-            'seg_portuaria' => null,
-            'merc_peligrosas' => null,
-            'sctr' => null,
-            'induc' => null,
-            'decla' => null,
+            'habilitacion_mtc' => null,
+            'bonificacion' => null,
+            'revision_tecnica' => null,
         ];
         
         $this->form->document_dates = [
-            'dni' => '',
-            'licencia' => '',
-            'pbip' => '',
-            'seg_portuaria' => '',
-            'merc_peligrosas' => '',
-            'sctr' => '',
-            'induc' => '',
-            'decla' => '',
+            'habilitacion_mtc' => '',
+            'bonificacion' => '',
+            'revision_tecnica' => '',
         ];
     }
     
     #[Computed]
-    public function drivers()
+    public function chassis()
     {
-        return Driver::with(['company', 'documents'])
+        return Chassis::with(['company', 'documents'])
             ->where('company_id', auth()->user()->company_id)
             ->when($this->search, function($query) {
-                $query->where(function($q) {
-                    $q->where('document_number', 'like', '%' . $this->search . '%')
-                      ->orWhere('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('lastname', 'like', '%' . $this->search . '%');
-                });
+                $query->where('license_plate', 'like', '%' . $this->search . '%');
             })
             ->when($this->statusFilter, function($query) {
                 $query->where('status', $this->statusFilter);
@@ -88,7 +74,7 @@ class extends Component {
     public function resetForm()
     {
         $this->form->reset();
-        $this->activeTab = 'personal';
+        $this->activeTab = 'chassis';
         $this->initializeDocuments();
         $this->resetValidation();
     }
@@ -115,19 +101,19 @@ class extends Component {
     
     public function checkDuplicate()
     {
-        \Log::info('checkDuplicate called with: ' . $this->form->document_number);
+        \Log::info('checkDuplicate called with: ' . $this->form->license_plate);
         
-        $this->resetErrorBag('form.document_number');
+        $this->resetErrorBag('form.license_plate');
         
-        if (strlen($this->form->document_number) >= 8) {
-            $exists = Driver::where('company_id', auth()->user()->company_id)
-                ->where('document_number', $this->form->document_number)
+        if (strlen($this->form->license_plate) >= 6) {
+            $exists = Chassis::where('company_id', auth()->user()->company_id)
+                ->where('license_plate', strtoupper($this->form->license_plate))
                 ->exists();
             
-            \Log::info('Driver exists: ' . ($exists ? 'YES' : 'NO'));
+            \Log::info('Chassis exists: ' . ($exists ? 'YES' : 'NO'));
             
             if ($exists) {
-                $this->addError('form.document_number', 'Ya existe un conductor registrado con este número de documento en esta empresa.');
+                $this->addError('form.license_plate', 'Ya existe un chassis registrado con esta placa en esta empresa.');
             }
         }
     }
@@ -139,29 +125,29 @@ class extends Component {
         
         try {
             \Log::info('Calling form->save()');
-            $driver = $this->form->save();
+            $chassis = $this->form->save();
             
-            \Log::info('Driver saved: ' . $driver->id);
+            \Log::info('Chassis saved: ' . $chassis->id);
             
             $this->closeModal();
-            $this->dispatch('driver-created');
-            session()->flash('message', 'Conductor registrado exitosamente.');
+            $this->dispatch('chassis-created');
+            session()->flash('message', 'Chassis registrado exitosamente.');
         } catch (\Exception $e) {
             \Log::error('Save error: ' . $e->getMessage());
             \Log::error($e->getTraceAsString());
-            $this->addError('save', 'Error al registrar el conductor: ' . $e->getMessage());
+            $this->addError('save', 'Error al registrar el chassis: ' . $e->getMessage());
         }
     }
     
     public function getStatusClass($status)
     {
         return match($status) {
-            DriverStatusEnum::ACTIVE => 'status-approved',
-            DriverStatusEnum::INACTIVE => 'status-rejected',
-            DriverStatusEnum::NEEDS_UPDATE => 'status-update',
-            DriverStatusEnum::PENDING_APPROVAL => 'status-pending',
-            DriverStatusEnum::DOCUMENT_REVIEW => 'status-review',
-            DriverStatusEnum::INFECTED_DOCUMENTS => 'status-infected',
+            ChassisStatusEnum::ACTIVE => 'status-approved',
+            ChassisStatusEnum::INACTIVE => 'status-rejected',
+            ChassisStatusEnum::NEEDS_UPDATE => 'status-update',
+            ChassisStatusEnum::PENDING_APPROVAL => 'status-wait',
+            ChassisStatusEnum::DOCUMENT_REVIEW => 'status-review',
+            ChassisStatusEnum::INFECTED_DOCUMENTS => 'status-infected',
             default => 'status-wait',
         };
     }
@@ -169,12 +155,12 @@ class extends Component {
     public function getStatusLabel($status)
     {
         return match($status) {
-            DriverStatusEnum::ACTIVE => '✓ Aprobado (Activo)',
-            DriverStatusEnum::INACTIVE => '✕ Rechazado (Inactivo)',
-            DriverStatusEnum::NEEDS_UPDATE => '⚠ Actualizar (Inactivo)',
-            DriverStatusEnum::PENDING_APPROVAL => '… Espera de aprobación',
-            DriverStatusEnum::DOCUMENT_REVIEW => '… Revisión Documentos',
-            DriverStatusEnum::INFECTED_DOCUMENTS => '✕ Documentos Infectados (Inactivo)',
+            ChassisStatusEnum::ACTIVE => '✓ Aprobado (Activo)',
+            ChassisStatusEnum::INACTIVE => '✕ Rechazado (Inactivo)',
+            ChassisStatusEnum::NEEDS_UPDATE => '⚠ Actualizar (Inactivo)',
+            ChassisStatusEnum::PENDING_APPROVAL => '… Espera de aprobación',
+            ChassisStatusEnum::DOCUMENT_REVIEW => '🔍 Revisión Documentos',
+            ChassisStatusEnum::INFECTED_DOCUMENTS => '🛡 Documentos Infectados (Inactivo)',
             default => '… Espera de aprobación',
         };
     }
@@ -183,7 +169,7 @@ class extends Component {
 
 @push('styles')
 <style>
-/* Drivers Module Styles */
+/* Chassis Module Styles */
 .page-title {
     display: flex !important;
     flex-direction: row !important;
@@ -349,24 +335,19 @@ class extends Component {
     color: #4b5563;
 }
 
+.status-wait {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
 .status-review {
     background: #dbeafe;
     color: #1e40af;
 }
 
 .status-infected {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-.status-wait {
-    background: #f3f4f6;
-    color: #6b7280;
-}
-
-.status-primary {
-    background: #e7f0ff;
-    color: #1e63d6;
+    background: #fecaca;
+    color: #7f1d1d;
 }
 
 /* Buttons */
@@ -694,156 +675,6 @@ class extends Component {
     cursor: not-allowed;
 }
 
-.modal-content {
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-}
-
-/* Modal Tabs */
-.nav-tabs {
-    background: #f1f3f5;
-    border-radius: 10px;
-    padding: 4px;
-    border-bottom: 0;
-    display: flex;
-    gap: 0;
-}
-
-.nav-tabs .nav-item {
-    flex: 1;
-}
-
-.nav-tabs .nav-link {
-    border: 0;
-    border-radius: 8px;
-    color: #6b6b6b;
-    background: transparent;
-    margin: 0;
-    width: 100%;
-    text-align: center;
-    padding: 10px 16px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-.nav-tabs .nav-link.active {
-    background: #fff;
-    color: #111;
-    font-weight: 600;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.nav-tabs .nav-link:hover:not(.active) {
-    color: #111;
-}
-
-/* Documents */
-.docs-required {
-    background: #fff7ea;
-    border: 1px solid #f3d7a8;
-    color: #6b4a18;
-    border-radius: 8px;
-    padding: 14px;
-}
-
-.docs-required .title {
-    font-weight: 700;
-    color: #6b4a18;
-    margin-bottom: 4px;
-}
-
-.docs-required .muted {
-    color: #6b4a18;
-    opacity: 0.9;
-}
-
-.docs-list .doc-item {
-    background: #fff;
-    border-radius: 8px;
-    padding: 14px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.03);
-    margin-bottom: 14px;
-}
-
-.upload-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    padding: 20px;
-    min-height: 68px;
-    border-radius: 10px;
-    border: 2px dashed rgba(139, 45, 32, 0.35);
-    background: transparent;
-    color: #8b2d20;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-.upload-btn:hover {
-    background: rgba(139, 45, 32, 0.02);
-    border-color: #8b2d20;
-}
-
-.upload-btn svg {
-    width: 20px;
-    height: 20px;
-}
-
-.file-name-top {
-    margin-bottom: 8px;
-    color: #6b6b6b;
-    font-weight: 500;
-}
-
-.file-badge {
-    display: block;
-    font-weight: 600;
-    color: #6b6b6b;
-    padding: 8px 6px;
-    background: transparent;
-    border-radius: 6px;
-    margin-top: 8px;
-}
-
-.file-badge.ok {
-    color: #1e63d6;
-}
-
-.remove-btn {
-    background: transparent;
-    border: 0;
-    color: #b94a4a;
-    font-weight: 700;
-    cursor: pointer;
-    margin-left: 8px;
-}
-
-.docs-list {
-    max-height: calc(60vh);
-    overflow: auto;
-    padding-right: 8px;
-}
-
-.docs-list::-webkit-scrollbar {
-    width: 8px;
-}
-
-.docs-list::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.08);
-    border-radius: 8px;
-}
-
-#docs-count {
-    display: inline-block;
-    padding: 6px 10px;
-    background: #fff;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-}
-
 /* Table Styles */
 .table {
     width: 100%;
@@ -907,12 +738,6 @@ class extends Component {
     background-color: #f9fafb;
 }
 
-.search-input {
-    border: 1px solid #e5e7eb;
-    padding: 10px 14px;
-    font-size: 0.95rem;
-}
-
 .btn-update-docs {
     display: inline-flex;
     align-items: center;
@@ -954,10 +779,10 @@ class extends Component {
     <div class="page-title">
         <div style="display: flex; align-items: center; gap: 14px;">
             <a href="{{ route('dashboard') }}" class="text-decoration-none" style="color:#6b6b6b;font-size:1.15rem;">←</a>
-            <h3 style="margin: 0; font-weight: 800; font-size: 1.4rem;">Gestión de Conductores</h3>
+            <h3 style="margin: 0; font-weight: 800; font-size: 1.4rem;">Gestión de Chassis</h3>
         </div>
         <button type="button" wire:click="openModal" class="btn-new">
-            <span class="btn-icon">+</span> Nuevo Conductor
+            <span class="btn-icon">+</span> Nuevo Chassis
         </button>
     </div>
 
@@ -970,7 +795,7 @@ class extends Component {
 
     <div class="card card-app">
         <div class="card-body" style="padding: 24px;">
-            <h5 class="mb-4" style="font-weight: 700; color: #111; font-size: 1.1rem;">Mis Conductores</h5>
+            <h5 class="mb-4" style="font-weight: 700; color: #111; font-size: 1.1rem;">Mis Chassis</h5>
 
             <div class="filters-row mb-4">
                 <div class="search-box-container">
@@ -983,7 +808,7 @@ class extends Component {
                             type="search" 
                             wire:model.live.debounce.300ms="search"
                             class="search-input-enhanced" 
-                            placeholder="Buscar por DNI, Licencia, Apellidos o Nombres...">
+                            placeholder="Buscar por placa...">
                     </div>
                 </div>
                 
@@ -992,12 +817,12 @@ class extends Component {
                         <label class="filter-label">Estado</label>
                         <select wire:model.live="statusFilter" class="filter-select">
                             <option value="">Todos los estados</option>
-                            <option value="{{ DriverStatusEnum::ACTIVE->value }}">✓ Aprobado (Activo)</option>
-                            <option value="{{ DriverStatusEnum::INACTIVE->value }}">✕ Rechazado (Inactivo)</option>
-                            <option value="{{ DriverStatusEnum::NEEDS_UPDATE->value }}">⚠ Actualizar (Inactivo)</option>
-                            <option value="{{ DriverStatusEnum::PENDING_APPROVAL->value }}">… Espera de aprobación</option>
-                            <option value="{{ DriverStatusEnum::DOCUMENT_REVIEW->value }}">… Revisión Documentos</option>
-                            <option value="{{ DriverStatusEnum::INFECTED_DOCUMENTS->value }}">✕ Documentos Infectados (Inactivo)</option>
+                            <option value="{{ ChassisStatusEnum::ACTIVE->value }}">✓ Aprobado (Activo)</option>
+                            <option value="{{ ChassisStatusEnum::PENDING_APPROVAL->value }}">… Espera de aprobación</option>
+                            <option value="{{ ChassisStatusEnum::DOCUMENT_REVIEW->value }}">🔍 Revisión Documentos</option>
+                            <option value="{{ ChassisStatusEnum::NEEDS_UPDATE->value }}">⚠ Actualizar (Inactivo)</option>
+                            <option value="{{ ChassisStatusEnum::INACTIVE->value }}">✕ Rechazado (Inactivo)</option>
+                            <option value="{{ ChassisStatusEnum::INFECTED_DOCUMENTS->value }}">🛡 Documentos Infectados</option>
                         </select>
                     </div>
                     
@@ -1019,35 +844,31 @@ class extends Component {
                     <thead class="table-light">
                         <tr>
                             <th scope="col">Fecha</th>
-                            <th scope="col">Conductor</th>
-                            <th scope="col">DNI</th>
-                            <th scope="col">Licencia</th>
+                            <th scope="col">Placa</th>
                             <th scope="col">Estado Solicitud</th>
                             <th scope="col">Documentos</th>
                             <th scope="col" class="text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($this->drivers as $driver)
-                            <tr wire:key="driver-{{ $driver->id }}">
-                                <td>{{ $driver->created_at->format('d/m/Y') }}</td>
-                                <td class="text-uppercase">{{ $driver->full_name }}</td>
-                                <td>{{ $driver->document_number }}</td>
-                                <td>{{ $driver->license_number ?? '-' }}</td>
+                        @forelse ($this->chassis as $chassisItem)
+                            <tr wire:key="chassis-{{ $chassisItem->id }}">
+                                <td>{{ $chassisItem->created_at->format('d/m/Y') }}</td>
+                                <td class="text-uppercase">{{ $chassisItem->license_plate }}</td>
                                 <td>
-                                    <span class="status-pill {{ $this->getStatusClass($driver->status) }}">
-                                        {{ $this->getStatusLabel($driver->status) }}
+                                    <span class="status-pill {{ $this->getStatusClass($chassisItem->status) }}">
+                                        {{ $this->getStatusLabel($chassisItem->status) }}
                                     </span>
                                 </td>
-                                <td>{{ $driver->documents->count() }} documento(s)</td>
+                                <td>{{ $chassisItem->documents->count() }} documento(s)</td>
                                 <td class="text-center">
-                                    @if($driver->status === DriverStatusEnum::NEEDS_UPDATE && $driver->appeal_token)
-                                        <a href="{{ route('driver.appeal.show', $driver->appeal_token) }}" 
+                                    @if($chassisItem->status === App\Enums\ChassisStatusEnum::NEEDS_UPDATE && $chassisItem->appeal_token)
+                                        <a href="{{ route('chassis.appeal.show', $chassisItem->appeal_token) }}" 
                                            class="btn-update-docs" 
                                            target="_blank">
                                             Actualizar Documentos
                                         </a>
-                                    @elseif($driver->status === DriverStatusEnum::INACTIVE)
+                                    @elseif($chassisItem->status === App\Enums\ChassisStatusEnum::INACTIVE)
                                         <span class="text-muted">Sin acciones disponibles</span>
                                     @else
                                         <span class="text-muted">-</span>
@@ -1056,8 +877,8 @@ class extends Component {
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center py-5">
-                                    <p class="text-muted mb-0">No se encontraron conductores.</p>
+                                <td colspan="5" class="text-center py-5">
+                                    <p class="text-muted mb-0">No se encontraron chassis.</p>
                                 </td>
                             </tr>
                         @endforelse
@@ -1065,9 +886,9 @@ class extends Component {
                 </table>
             </div>
 
-            @if($this->drivers->hasPages())
+            @if($this->chassis->hasPages())
             <div class="mt-3">
-                {{ $this->drivers->links() }}
+                {{ $this->chassis->links() }}
             </div>
             @endif
         </div>
@@ -1080,18 +901,18 @@ class extends Component {
         <div class="modal-dialog-custom">
             <div class="modal-content-custom">
                 <div class="modal-header-custom">
-                    <h5 class="modal-title-custom">Registrar Nuevo Conductor</h5>
+                    <h5 class="modal-title-custom">Registrar Nuevo Chassis</h5>
                     <button type="button" class="btn-close-custom" wire:click="closeModal" aria-label="Cerrar">×</button>
                 </div>
                 <div class="modal-body-custom">
-                    <p class="modal-description">Completa todos los datos del conductor. El estado iniciará como "Pendiente" para revisión del administrador.</p>
+                    <p class="modal-description">Completa todos los datos del chassis. El estado iniciará como "Inactivo" para revisión del administrador.</p>
 
                     <div class="tabs-container">
                         <button 
-                            class="tab-button {{ $activeTab === 'personal' ? 'active' : '' }}" 
-                            wire:click="setTab('personal')"
+                            class="tab-button {{ $activeTab === 'chassis' ? 'active' : '' }}" 
+                            wire:click="setTab('chassis')"
                             type="button">
-                            Datos Personales
+                            Datos del Chassis
                         </button>
                         <button 
                             class="tab-button {{ $activeTab === 'docs' ? 'active' : '' }}"
@@ -1102,26 +923,27 @@ class extends Component {
                     </div>
 
                     <div class="tab-content-area">
-                        <!-- Personal Data Tab -->
-                        @if($activeTab === 'personal')
+                        <!-- Chassis Data Tab -->
+                        @if($activeTab === 'chassis')
                         <div class="tab-pane-active">
                             <div class="alert-info-box">
-                                <strong>Completa tu información.</strong> Los campos con * son obligatorios.
+                                <strong>Completa la información.</strong> Los campos con * son obligatorios.
                             </div>
                             <form>
                                 <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label-custom">DNI <span class="text-danger">*</span></label>
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label-custom">Placa <span class="text-danger">*</span></label>
                                         <input 
                                             type="text" 
-                                            wire:model="form.document_number"
+                                            wire:model="form.license_plate"
                                             wire:change="checkDuplicate"
-                                            class="form-control-custom @error('form.document_number') is-invalid @enderror" 
-                                            placeholder="12345678"
-                                            maxlength="20">
-                                        <small class="form-hint">8 dígitos</small>
+                                            class="form-control-custom @error('form.license_plate') is-invalid @enderror" 
+                                            placeholder="ABC-123"
+                                            maxlength="10"
+                                            style="text-transform: uppercase;">
+                                        <small class="form-hint">Formato: ABC-123 o ABC123</small>
                                         
-                                        @error('form.document_number')
+                                        @error('form.license_plate')
                                             <div class="mt-2">
                                                 <small class="text-danger d-flex align-items-center">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-exclamation-circle-fill me-1" viewBox="0 0 16 16">
@@ -1130,40 +952,6 @@ class extends Component {
                                                     {{ $message }}
                                                 </small>
                                             </div>
-                                        @enderror
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label-custom">Nombres <span class="text-danger">*</span></label>
-                                        <input 
-                                            type="text" 
-                                            wire:model="form.name"
-                                            class="form-control-custom @error('form.name') is-invalid @enderror" 
-                                            placeholder="Juan Carlos">
-                                        @error('form.name')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label-custom">Apellidos <span class="text-danger">*</span></label>
-                                        <input 
-                                            type="text" 
-                                            wire:model="form.lastname"
-                                            class="form-control-custom @error('form.lastname') is-invalid @enderror" 
-                                            placeholder="Pérez García">
-                                        @error('form.lastname')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label-custom">Licencia <span class="text-danger">*</span></label>
-                                        <input 
-                                            type="text" 
-                                            wire:model="form.license_number"
-                                            class="form-control-custom @error('form.license_number') is-invalid @enderror" 
-                                            placeholder="LIC-123456">
-                                        @error('form.license_number')
-                                            <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
@@ -1190,14 +978,9 @@ class extends Component {
 
                             <div class="docs-list-container">
                                 @foreach([
-                                    ['key' => 'dni', 'label' => 'DNI, Pasaporte o Carnet de Extranjería', 'required' => true],
-                                    ['key' => 'licencia', 'label' => 'Licencia de conducir', 'required' => true],
-                                    ['key' => 'pbip', 'label' => 'Certificado de Curso Básico PBIP I', 'required' => true],
-                                    ['key' => 'seg_portuaria', 'label' => 'Certificado del Curso Básico de Seguridad Portuaria', 'required' => true],
-                                    ['key' => 'merc_peligrosas', 'label' => 'Certificado del Curso Básico de Mercancías Peligrosas', 'required' => false],
-                                    ['key' => 'sctr', 'label' => 'SCTR (Salud y Pensión)', 'required' => true],
-                                    ['key' => 'induc', 'label' => 'Inducción de seguridad y medio ambiente virtual', 'required' => true],
-                                    ['key' => 'decla', 'label' => 'Declaración Jurada de no poseer Antecedentes', 'required' => true],
+                                    ['key' => 'habilitacion_mtc', 'label' => 'Habilitación MTC', 'required' => true],
+                                    ['key' => 'bonificacion', 'label' => 'Bonificación', 'required' => true],
+                                    ['key' => 'revision_tecnica', 'label' => 'Revisión Técnica', 'required' => true],
                                 ] as $doc)
                                     <div class="doc-item-box">
                                         <div class="row">
@@ -1243,7 +1026,6 @@ class extends Component {
                         type="button" 
                         class="btn-submit" 
                         wire:click="save"
-                        onclick="console.log('Button clicked')"
                         wire:loading.attr="disabled">
                         <span wire:loading.remove>Registrar</span>
                         <span wire:loading>Guardando...</span>

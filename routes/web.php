@@ -21,6 +21,22 @@ Route::put('/driver/appeal/{token}', [App\Http\Controllers\DriverAppealControlle
 Route::get('/driver/appeal-success', [App\Http\Controllers\DriverAppealController::class, 'success'])
     ->name('driver.appeal.success');
 
+// Rutas públicas para actualización de documentos de vehículos
+Route::get('/truck/appeal/{token}', [App\Http\Controllers\TruckAppealController::class, 'show'])
+    ->name('truck.appeal.show');
+Route::put('/truck/appeal/{token}', [App\Http\Controllers\TruckAppealController::class, 'update'])
+    ->name('truck.appeal.update');
+Route::get('/truck/appeal-success', [App\Http\Controllers\TruckAppealController::class, 'success'])
+    ->name('truck.appeal.success');
+
+// Rutas públicas para actualización de documentos de chassis
+Route::get('/chassis/appeal/{token}', [App\Http\Controllers\ChassisAppealController::class, 'show'])
+    ->name('chassis.appeal.show');
+Route::put('/chassis/appeal/{token}', [App\Http\Controllers\ChassisAppealController::class, 'update'])
+    ->name('chassis.appeal.update');
+Route::get('/chassis/appeal-success', [App\Http\Controllers\ChassisAppealController::class, 'success'])
+    ->name('chassis.appeal.success');
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -37,6 +53,12 @@ Route::middleware('auth')->group(function () {
     
     Volt::route('drivers', 'drivers.drivers')
         ->name('drivers');
+    
+    Volt::route('trucks', 'trucks.trucks')
+        ->name('trucks');
+    
+    Volt::route('chassis', 'chassis.chassis')
+        ->name('chassis');
 });
 
 require __DIR__.'/auth.php';

@@ -11,6 +11,7 @@ use App\Filament\Resources\Drivers\Schemas\DriverInfolist;
 use App\Filament\Resources\Drivers\Tables\DriversTable;
 use App\Models\Driver;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -29,6 +30,8 @@ class DriverResource extends Resource
     protected static ?string $modelLabel = 'Conductor';
 
     protected static ?string $pluralModelLabel = 'Conductores';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Gestión de Transporte';
 
     protected static ?string $recordTitleAttribute = 'name';
 
