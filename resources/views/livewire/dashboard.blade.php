@@ -1,7 +1,7 @@
 <?php
 
-use App\Enums\{CompanyStatusEnum, DriverStatusEnum};
-use App\Models\Driver;
+use App\Enums\{CompanyStatusEnum, DriverStatusEnum, TruckStatusEnum, ChassisStatusEnum};
+use App\Models\{Driver, Truck, Chassis};
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -40,19 +40,58 @@ class extends Component {
             ->count();
     }
     
-    // TODO: Add Trucks and Chassis stats when models are ready
-    public $trucks_pending = 0;
-    public $trucks_approved = 0;
-    public $trucks_rejected = 0;
+    #[Computed]
+    public function trucks_pending()
+    {
+        return Truck::where('company_id', auth()->user()->company_id)
+            ->whereIn('status', [TruckStatusEnum::PENDING_APPROVAL, TruckStatusEnum::DOCUMENT_REVIEW])
+            ->count();
+    }
     
-    public $chassis_pending = 0;
-    public $chassis_approved = 0;
-    public $chassis_rejected = 0;
-};
+    #[Computed]
+    public function trucks_approved()
+    {
+        return Truck::where('company_id', auth()->user()->company_id)
+            ->where('status', TruckStatusEnum::ACTIVE)
+            ->count();
+    }
+    
+    #[Computed]
+    public function trucks_rejected()
+    {
+        return Truck::where('company_id', auth()->user()->company_id)
+            ->whereIn('status', [TruckStatusEnum::INACTIVE, TruckStatusEnum::NEEDS_UPDATE, TruckStatusEnum::INFECTED_DOCUMENTS])
+            ->count();
+    }
+    
+    #[Computed]
+    public function chassis_pending()
+    {
+        return Chassis::where('company_id', auth()->user()->company_id)
+            ->whereIn('status', [ChassisStatusEnum::PENDING_APPROVAL, ChassisStatusEnum::DOCUMENT_REVIEW])
+            ->count();
+    }
+    
+    #[Computed]
+    public function chassis_approved()
+    {
+        return Chassis::where('company_id', auth()->user()->company_id)
+            ->where('status', ChassisStatusEnum::ACTIVE)
+            ->count();
+    }
+    
+    #[Computed]
+    public function chassis_rejected()
+    {
+        return Chassis::where('company_id', auth()->user()->company_id)
+            ->whereIn('status', [ChassisStatusEnum::INACTIVE, ChassisStatusEnum::NEEDS_UPDATE, ChassisStatusEnum::INFECTED_DOCUMENTS])
+            ->count();
+    }
+};  
 ?>
 
 
-<div>
+<div wire:poll.5s>
 
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-slate-900">Dashboard</h1>
@@ -141,15 +180,15 @@ class extends Component {
 
             <div class="grid grid-cols-3 gap-3">
                 <div class="p-3 bg-amber-50 rounded text-center">
-                    <div class="text-xl font-semibold text-amber-700">{{ $trucks_pending ?? 0 }}</div>
+                    <div class="text-xl font-semibold text-amber-700">{{ $this->trucks_pending }}</div>
                     <div class="text-xs text-amber-600">Pendientes</div>
                 </div>
                 <div class="p-3 bg-emerald-50 rounded text-center">
-                    <div class="text-xl font-semibold text-emerald-700">{{ $trucks_approved ?? 0 }}</div>
+                    <div class="text-xl font-semibold text-emerald-700">{{ $this->trucks_approved }}</div>
                     <div class="text-xs text-emerald-600">Aprobadas</div>
                 </div>
                 <div class="p-3 bg-rose-50 rounded text-center">
-                    <div class="text-xl font-semibold text-rose-700">{{ $trucks_rejected ?? 0 }}</div>
+                    <div class="text-xl font-semibold text-rose-700">{{ $this->trucks_rejected }}</div>
                     <div class="text-xs text-rose-600">Rechazadas</div>
                 </div>
             </div>
@@ -168,15 +207,15 @@ class extends Component {
 
             <div class="grid grid-cols-3 gap-3">
                 <div class="p-3 bg-amber-50 rounded text-center">
-                    <div class="text-xl font-semibold text-amber-700">{{ $chassis_pending ?? 0 }}</div>
+                    <div class="text-xl font-semibold text-amber-700">{{ $this->chassis_pending }}</div>
                     <div class="text-xs text-amber-600">Pendientes</div>
                 </div>
                 <div class="p-3 bg-emerald-50 rounded text-center">
-                    <div class="text-xl font-semibold text-emerald-700">{{ $chassis_approved ?? 0 }}</div>
+                    <div class="text-xl font-semibold text-emerald-700">{{ $this->chassis_approved }}</div>
                     <div class="text-xs text-emerald-600">Aprobadas</div>
                 </div>
                 <div class="p-3 bg-rose-50 rounded text-center">
-                    <div class="text-xl font-semibold text-rose-700">{{ $chassis_rejected ?? 0 }}</div>
+                    <div class="text-xl font-semibold text-rose-700">{{ $this->chassis_rejected }}</div>
                     <div class="text-xs text-rose-600">Rechazadas</div>
                 </div>
             </div>

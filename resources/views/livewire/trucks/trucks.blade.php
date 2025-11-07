@@ -20,6 +20,8 @@ class extends Component {
     public $perPage = 10;
     public $statusFilter = '';
     public $showModal = false;
+    public $showInfoModal = false;
+    public $selectedTruck = null;
     
     // Tab control
     public $activeTab = 'vehicle';
@@ -103,6 +105,18 @@ class extends Component {
     public function updatedStatusFilter()
     {
         $this->resetPage();
+    }
+    
+    public function viewInfo($truckId)
+    {
+        $this->selectedTruck = Truck::with(['documents'])->findOrFail($truckId);
+        $this->showInfoModal = true;
+    }
+    
+    public function closeInfoModal()
+    {
+        $this->showInfoModal = false;
+        $this->selectedTruck = null;
     }
     
     public function checkDuplicate()
@@ -408,7 +422,8 @@ class extends Component {
     z-index: 1040;
 }
 
-.modal-wrapper {
+.modal-wrapper,
+.modal-custom-wrapper {
     position: fixed;
     top: 0;
     left: 0;
@@ -420,6 +435,14 @@ class extends Component {
     align-items: center;
     justify-content: center;
     padding: 20px;
+}
+
+.modal-custom {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    border: none;
+    width: 100%;
 }
 
 .modal-dialog-custom {
@@ -450,7 +473,8 @@ class extends Component {
     margin: 0;
 }
 
-.btn-close-custom {
+.btn-close-custom,
+.modal-close-custom {
     background: transparent;
     border: none;
     font-size: 2rem;
@@ -467,7 +491,8 @@ class extends Component {
     transition: all 0.2s;
 }
 
-.btn-close-custom:hover {
+.btn-close-custom:hover,
+.modal-close-custom:hover {
     background: #f3f4f6;
     color: #111;
 }
@@ -641,6 +666,68 @@ class extends Component {
     gap: 10px;
 }
 
+/* Estilos para modal de información */
+.info-section {
+    margin-bottom: 24px;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-title i {
+    color: #8b2d20;
+    font-size: 1.2rem;
+}
+
+.info-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.info-item {
+    margin-bottom: 0;
+}
+
+.info-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.info-value {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1f2937;
+    margin: 0;
+}
+
+.info-value .badge {
+    font-size: 0.85rem;
+    padding: 4px 12px;
+    border-radius: 6px;
+}
+
 .btn-cancel {
     padding: 11px 24px;
     border: 1px solid #d1d5db;
@@ -771,6 +858,34 @@ class extends Component {
     transform: translateY(0);
 }
 
+.btn-view-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.btn-view-info:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+    color: white;
+}
+
+.btn-view-info:active {
+    transform: translateY(0);
+}
+
 @media (max-width: 768px) {
     .page-title {
         flex-direction: column;
@@ -859,16 +974,20 @@ class extends Component {
                     <tbody>
                         @forelse ($this->trucks as $truck)
                             <tr wire:key="truck-{{ $truck->id }}">
-                                <td>{{ $truck->created_at->format('d/m/Y') }}</td>
-                                <td class="text-uppercase">{{ $truck->license_plate }}</td>
-                                <td>
+                                <td class="text-center">{{ $truck->created_at->format('d/m/Y') }}</td>
+                                <td class="text-center text-uppercase">{{ $truck->license_plate }}</td>
+                                <td class="text-center">
                                     <span class="status-pill {{ $this->getStatusClass($truck->status) }}">
                                         {{ $this->getStatusLabel($truck->status) }}
                                     </span>
                                 </td>
-                                <td>{{ $truck->documents->count() }} documento(s)</td>
+                                <td class="text-center">{{ $truck->documents->count() }} documento(s)</td>
                                 <td class="text-center">
-                                    @if($truck->status === App\Enums\TruckStatusEnum::NEEDS_UPDATE && $truck->appeal_token)
+                                    @if($truck->status === App\Enums\TruckStatusEnum::ACTIVE)
+                                        <button wire:click="viewInfo({{ $truck->id }})" class="btn-view-info">
+                                            Ver Información
+                                        </button>
+                                    @elseif($truck->status === App\Enums\TruckStatusEnum::NEEDS_UPDATE && $truck->appeal_token)
                                         <a href="{{ route('truck.appeal.show', $truck->appeal_token) }}" 
                                            class="btn-update-docs" 
                                            target="_blank">
@@ -1108,6 +1227,119 @@ class extends Component {
                         <span wire:loading>Guardando...</span>
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Modal de Información -->
+    @if($showInfoModal && $selectedTruck)
+    <div class="modal-backdrop-custom"></div>
+    <div class="modal-custom-wrapper">
+        <div class="modal-custom" style="max-width: 800px;">
+            <div class="modal-header-custom">
+                <h4 class="modal-title-custom">Información del Vehículo</h4>
+                <button type="button" class="modal-close-custom" wire:click="closeInfoModal">&times;</button>
+            </div>
+            
+            <div class="modal-body-custom" style="padding: 28px;">
+                <!-- Información General -->
+                <div class="info-section mb-4">
+                    <h5 class="section-title mb-3">
+                        <i class="bi bi-truck"></i> Datos del Vehículo
+                    </h5>
+                    <div class="info-card">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label class="info-label">Placa</label>
+                                <p class="info-value">{{ $selectedTruck->license_plate }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Nacionalidad</label>
+                                <p class="info-value">{{ $selectedTruck->nationality }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Tipo de Camión</label>
+                                <p class="info-value">{{ $selectedTruck->truck_type }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Tara</label>
+                                <p class="info-value">{{ $selectedTruck->tare ? $selectedTruck->tare . ' ton' : 'N/A' }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">¿Es Interno?</label>
+                                <p class="info-value">
+                                    @if($selectedTruck->is_internal)
+                                        <span class="badge bg-success">Sí</span>
+                                    @else
+                                        <span class="badge bg-secondary">No</span>
+                                    @endif
+                                </p>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Bonificación</label>
+                                <p class="info-value">
+                                    @if($selectedTruck->has_bonus)
+                                        <span class="badge bg-success">Sí</span>
+                                    @else
+                                        <span class="badge bg-secondary">No</span>
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documentos y Vencimientos -->
+                <div class="info-section">
+                    <h5 class="section-title mb-3">
+                        <i class="bi bi-file-earmark-text"></i> Documentos y Vencimientos
+                    </h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead style="background-color: #f8f9fa;">
+                            <tr>
+                                <th>Tipo de Documento</th>
+                                <th class="text-center">Fecha de Vencimiento</th>
+                                <th class="text-center">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($selectedTruck->documents as $document)
+                            <tr>
+                                <td>{{ $document->type->getLabel() }}</td>
+                                <td class="text-center">
+                                    @if($document->expiration_date)
+                                        {{ $document->expiration_date->format('d/m/Y') }}
+                                        @if($document->expiration_date->isPast())
+                                            <span class="badge bg-danger ms-2">Vencido</span>
+                                        @endif
+                                    @else
+                                        <span class="text-muted">Sin vencimiento</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    @if($document->status == 1)
+                                        <span class="badge bg-warning">Pendiente</span>
+                                    @elseif($document->status == 2)
+                                        <span class="badge bg-success">Aprobado</span>
+                                    @elseif($document->status == 3)
+                                        <span class="badge bg-danger">Rechazado</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="3" class="text-center">No hay documentos registrados</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="modal-footer-custom">
+                <button type="button" class="btn-cancel" wire:click="closeInfoModal">Cerrar</button>
             </div>
         </div>
     </div>
