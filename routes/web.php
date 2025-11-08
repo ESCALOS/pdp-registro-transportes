@@ -46,7 +46,7 @@ Route::get('/password/reset-success', [App\Http\Controllers\PasswordResetControl
     ->name('password.reset.success');
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 // Rutas para registro de empresa
