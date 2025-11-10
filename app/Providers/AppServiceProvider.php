@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Document;
+use App\Observers\DocumentObserver;
 use App\Policies\ActivityPolicy;
 use BezhanSalleh\FilamentShield\Facades\FilamentShield;
 use Filament\Tables\Table;
@@ -31,6 +33,13 @@ class AppServiceProvider extends ServiceProvider
         $this->configureModels();
 
         $this->configureFilament();
+
+        $this->configureObservers();
+    }
+
+    private function configureObservers(): void
+    {
+        Document::observe(DocumentObserver::class);
     }
 
     private function configurePolicies(): void

@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
-            $table->string('type')->default('natural');
+            $table->integer('type')->default(1)->comment('1: Natural, 2: Jurídica');
             $table->string('ruc', 11)->unique();
             $table->string('business_name');
-            $table->string('status')->default('pending');
-            $table->string('name');
+            $table->integer('status')->default(1)->comment('1: Pendiente, 2: Aprobado, 3: Rechazado');
+            $table->boolean('is_active')->default(true);
+            $table->string('appeal_token')->nullable()->unique()->after('status');
+            $table->timestamp('appeal_token_expires_at')->nullable()->after('appeal_token');
             $table->timestamps();
             $table->softDeletes();
         });

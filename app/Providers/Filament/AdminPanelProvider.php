@@ -3,6 +3,8 @@
 namespace App\Providers\Filament;
 
 use Andreia\FilamentNordTheme\FilamentNordThemePlugin;
+use App\Filament\Widgets\TotalsOverview;
+use App\Filament\Widgets\TransportStatsOverview;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -21,6 +23,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Jeffgreco13\FilamentBreezy\BreezyCore;
+
 use Swis\Filament\Backgrounds\FilamentBackgroundsPlugin;
 
 class AdminPanelProvider extends PanelProvider
@@ -45,8 +48,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
+                TotalsOverview::class,
+                TransportStatsOverview::class,
             ])
             ->plugins([
                 FilamentShieldPlugin::make(),
@@ -69,6 +72,7 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
+            ->spa()
             ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }
